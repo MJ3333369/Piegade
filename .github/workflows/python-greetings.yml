@@ -31,9 +31,9 @@ jobs:
             catch {
               pip3 install -r requirements.txt
             }
-          }
-          else {
+          } else {
             echo "requirements.txt file not found."
+          }
 
   deploy-to-dev:
     name: Deploy to Development Environment
