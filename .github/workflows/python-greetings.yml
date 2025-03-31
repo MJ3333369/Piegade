@@ -20,15 +20,15 @@ jobs:
           path: greetings
 
       - name: Install Python dependencies
+        shell: pwsh
         working-directory: greetings
         run: |
-  echo "Installing all required dependencies..."
-  if (Test-Path "requirements.txt") {
-    try {
-      pip install -r requirements.txt
-    } catch {
-      pip3 install -r requirements.txt
-    }
-  } else {
-    echo "requirements.txt file not found."
-  }
+          echo "Installing all required dependencies..."
+          if (Test-Path "requirements.txt") {
+            try {
+              pip install -r requirements.txt
+            } catch {
+              pip3 install -r requirements.txt
+            }
+          } else {
+            echo "requirements.txt file not found."
