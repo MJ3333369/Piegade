@@ -90,5 +90,4 @@ jobs:
         run: |
           echo "Running Mocha greetings tests against http://127.0.0.1:7001..."
           $env:BASE_URL="http://127.0.0.1:7001"
-          $env:env="greetings_dev"
-          npm run greetings
+          node -e "global.env='greetings_dev'; require('child_process').execSync('npm run greetings', {stdio: 'inherit'})"
