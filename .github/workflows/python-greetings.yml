@@ -86,10 +86,10 @@ jobs:
           echo "Installing Node.js test dependencies..."
           npm install
 
-      - name: Run tests against dev server
+      - name: Run Mocha tests (greetings)
         shell: powershell
         working-directory: test-framework
         run: |
-          echo "Running Playwright tests against http://localhost:7001..."
+          echo "Running Mocha greetings tests against http://localhost:7001..."
           $env:BASE_URL="http://localhost:7001"
-          npx playwright test --project=API
+          npm run greetings
