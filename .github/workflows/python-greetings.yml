@@ -24,15 +24,18 @@ jobs:
         working-directory: greetings
         run: |
           echo "Installing all required dependencies..."
+
           if (Test-Path "requirements.txt") {
             try {
               pip install -r requirements.txt
-            } catch {
+            }
+            catch {
               pip3 install -r requirements.txt
             }
           }
           else {
             echo "requirements.txt file not found."
+          }
 
   deploy-to-dev:
     name: Deploy to Development Environment
