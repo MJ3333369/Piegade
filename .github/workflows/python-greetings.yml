@@ -62,6 +62,8 @@ jobs:
         run: |
           echo "Starting greetings-app-dev..."
           pm2 start app.py --name greetings-app-dev
+          echo "Waiting for app to fully start..."
+          Start-Sleep -Seconds 5
 
   tests-on-dev:
     name: Run Tests on Development Environment
