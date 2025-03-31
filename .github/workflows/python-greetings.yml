@@ -53,14 +53,10 @@ jobs:
 
       - name: Stop existing app (if running)
         shell: powershell
+        continue-on-error: true
         run: |
           echo "Stopping existing greetings-app-dev instance (if any)..."
-          try {
-            pm2 delete greetings-app-dev
-          }
-          catch {
-            echo "No existing process to stop"
-          }
+          pm2 delete greetings-app-dev
 
       - name: Start greetings app on port 7001
         shell: powershell
