@@ -90,6 +90,6 @@ jobs:
         shell: powershell
         working-directory: test-framework
         run: |
-          echo "Running Mocha greetings tests against http://localhost:7001..."
-          $env:BASE_URL="http://localhost:7001"
-          npm run greetings
+          echo "Running Mocha greetings tests against http://127.0.0.1:7001..."
+          $env:BASE_URL="http://127.0.0.1:7001"
+          node -e "global.env='greetings_dev'; require('child_process').execSync('npm run greetings', {stdio: 'inherit'})"
