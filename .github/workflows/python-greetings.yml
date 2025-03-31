@@ -20,7 +20,7 @@ jobs:
           path: greetings
 
       - name: Install Python dependencies
-        shell: pwsh
+        shell: powershell
         working-directory: greetings
         run: |
           echo "Installing all required dependencies..."
