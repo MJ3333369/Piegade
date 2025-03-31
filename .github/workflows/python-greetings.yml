@@ -24,7 +24,6 @@ jobs:
         working-directory: greetings
         run: |
           echo "Installing all required dependencies..."
-
           if (Test-Path "requirements.txt") {
             try {
               pip install -r requirements.txt
@@ -85,6 +84,13 @@ jobs:
         run: |
           echo "Installing Node.js test dependencies..."
           npm install
+
+      - name: Debug config info
+        shell: powershell
+        working-directory: test-framework
+        run: |
+          echo "DEBUG: Checking config..."
+          node -e "global.env='greetings_dev'; const { config } = require('./config.js'); console.log('ENV:', global.env); console.log('HOST:', config[global.env]?.host);"
 
       - name: Run Mocha tests (greetings)
         shell: powershell
