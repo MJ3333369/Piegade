@@ -19,24 +19,12 @@ jobs:
           repository: mtararujs/python-greetings
           path: greetings
 
-      - name: Print current working directory
-        shell: "C:/Program Files/Git/bin/bash.exe"
-        run: |
-          echo "Current directory:"
-          pwd
-
-      - name: List files in greetings dir
-        shell: "C:/Program Files/Git/bin/bash.exe"
-        working-directory: greetings
-        run: |
-          echo "Contents of greetings directory:"
-          ls -la
-
       - name: Install Python dependencies
         shell: "C:/Program Files/Git/bin/bash.exe"
-        working-directory: greetings
         run: |
+          cd greetings
           echo "Installing Python dependencies..."
+          ls -la
           pip install -r requirements.txt
 
   deploy-to-dev:
@@ -55,19 +43,19 @@ jobs:
 
       - name: Stop existing app
         shell: "C:/Program Files/Git/bin/bash.exe"
-        working-directory: greetings
         run: |
-          echo "Stopping existing PM2 app (if running)..."
+          cd greetings
+          echo "Stopping previous PM2 app (if running)..."
           pm2 delete greetings-app-dev || true
 
       - name: Start app with PM2
         shell: "C:/Program Files/Git/bin/bash.exe"
-        working-directory: greetings
         run: |
-          echo "Starting greetings-app-dev on port 7001..."
+          cd greetings
+          echo "Starting Flask app with PM2 on port 7001..."
           pm2 start app.py --name greetings-app-dev -- --port 7001
 
-      - name: Check PM2 process status
+      - name: Check PM2 status
         shell: "C:/Program Files/Git/bin/bash.exe"
         run: |
           pm2 list
@@ -75,7 +63,7 @@ jobs:
       - name: Wait for app to be ready
         shell: "C:/Program Files/Git/bin/bash.exe"
         run: |
-          echo "Waiting 10s for app to start..."
+          echo "Waiting 10 seconds..."
           sleep 10
 
       - name: Show PM2 logs
@@ -99,14 +87,14 @@ jobs:
 
       - name: Install test dependencies
         shell: "C:/Program Files/Git/bin/bash.exe"
-        working-directory: test-framework
         run: |
+          cd test-framework
           echo "Installing test dependencies..."
           npm install
 
       - name: Run greetings tests
         shell: "C:/Program Files/Git/bin/bash.exe"
-        working-directory: test-framework
         run: |
+          cd test-framework
           echo "Running greetings tests..."
           npm run greetings greetings_dev
