@@ -77,11 +77,11 @@ jobs:
           echo "Installing test dependencies..."
           npm install
 
-      - name: Run greetings tests with cross-env fix
+      - name: Run greetings tests with correct global.env
         shell: powershell
         working-directory: test-framework
         run: |
           echo "Installing cross-env if missing..."
           npm install cross-env
-          echo "Running greetings tests with global.env=dev..."
-          npx cross-env global.env=dev mocha "tests/scenarios/greetings/*.js" --reporter mochawesome --timeout 20000
+          echo "Running greetings tests with global.env=greetings_dev..."
+          npx cross-env global.env=greetings_dev mocha "tests/scenarios/greetings/*.js" --reporter mochawesome --timeout 20000
