@@ -77,9 +77,9 @@ jobs:
           echo "Installing test dependencies..."
           npm install
 
-      - name: Run greetings tests with CLI environment override
+      - name: Run greetings tests (npm run greetings greetings_dev)
         shell: powershell
         working-directory: test-framework
         run: |
-          echo "Running greetings tests with environment argument: greetings_dev"
-          npx mocha "tests/scenarios/greetings/*.js" greetings_dev --reporter mochawesome --timeout 20000
+          echo "Running greetings tests..."
+          npm run greetings greetings_dev
