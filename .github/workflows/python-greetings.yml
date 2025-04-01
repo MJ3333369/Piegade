@@ -20,11 +20,10 @@ jobs:
           path: greetings
 
       - name: Install Python dependencies
-        shell: "C:/Program Files/Git/bin/bash.exe"
+        shell: powershell
+        working-directory: greetings
         run: |
-          cd greetings
-          echo "Installing Python dependencies..."
-          ls -la
+          echo "Installing all required dependencies..."
           pip install -r requirements.txt
 
   deploy-to-dev:
@@ -42,34 +41,26 @@ jobs:
           path: greetings
 
       - name: Stop existing app
-        shell: "C:/Program Files/Git/bin/bash.exe"
+        shell: powershell
+        working-directory: greetings
+        continue-on-error: true
         run: |
-          cd greetings
-          echo "Stopping previous PM2 app (if running)..."
-          pm2 delete greetings-app-dev || true
+          echo "Stopping old app (if running)..."
+          pm2 delete greetings-app-dev; exit 0
 
       - name: Start app with PM2
-        shell: "C:/Program Files/Git/bin/bash.exe"
+        shell: powershell
+        working-directory: greetings
         run: |
-          cd greetings
-          echo "Starting Flask app with PM2 on port 7001..."
-          pm2 start app.py --name greetings-app-dev -- --port 7001
+          echo "Starting greetings-app-dev on port 7001..."
+          pm2 start app.py --name greetings-app-dev --interpreter python
+          Start-Sleep -Seconds 10
 
-      - name: Check PM2 status
-        shell: "C:/Program Files/Git/bin/bash.exe"
+      - name: Check PM2 process status
+        shell: powershell
         run: |
+          echo "PM2 process list:"
           pm2 list
-
-      - name: Wait for app to be ready
-        shell: "C:/Program Files/Git/bin/bash.exe"
-        run: |
-          echo "Waiting 10 seconds..."
-          sleep 10
-
-      - name: Show PM2 logs
-        shell: "C:/Program Files/Git/bin/bash.exe"
-        run: |
-          pm2 logs greetings-app-dev --lines 50
 
   tests-on-dev:
     name: Run Tests on Development Environment
@@ -86,15 +77,15 @@ jobs:
           path: test-framework
 
       - name: Install test dependencies
-        shell: "C:/Program Files/Git/bin/bash.exe"
+        shell: powershell
+        working-directory: test-framework
         run: |
-          cd test-framework
           echo "Installing test dependencies..."
           npm install
 
       - name: Run greetings tests
-        shell: "C:/Program Files/Git/bin/bash.exe"
+        shell: powershell
+        working-directory: test-framework
         run: |
-          cd test-framework
           echo "Running greetings tests..."
           npm run greetings greetings_dev
