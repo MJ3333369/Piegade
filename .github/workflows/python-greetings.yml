@@ -81,7 +81,7 @@ jobs:
         shell: powershell
         working-directory: test-framework
         env:
-          BASE_URL: http://127.0.0.1:7001
+          global.env: dev
         run: |
-          echo "Running greetings tests directly..."
+          echo "Running greetings tests with global.env=dev..."
           npx mocha "tests/scenarios/greetings/*.js" --reporter mochawesome --timeout 20000
