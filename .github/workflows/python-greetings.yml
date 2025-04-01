@@ -54,6 +54,7 @@ jobs:
         run: |
           echo "Starting greetings-app-dev on port 7001..."
           pm2 start app.py --name greetings-app-dev --interpreter python --interpreter-args "--port 7001"
+          Start-Sleep -Seconds 5
 
   tests-on-dev:
     name: Run Tests on Development Environment
@@ -81,4 +82,5 @@ jobs:
         working-directory: test-framework
         run: |
           echo "Running greetings tests against http://127.0.0.1:7001..."
+          $env:BASE_URL = "http://127.0.0.1:7001"
           npm run greetings
