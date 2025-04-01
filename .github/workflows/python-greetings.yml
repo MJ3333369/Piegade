@@ -77,10 +77,11 @@ jobs:
           echo "Installing test dependencies..."
           npm install
 
-      - name: Run greetings tests
+      - name: Run greetings tests directly (override)
         shell: powershell
         working-directory: test-framework
+        env:
+          BASE_URL: http://127.0.0.1:7001
         run: |
-          echo "Running greetings tests against http://127.0.0.1:7001..."
-          $env:BASE_URL = "http://127.0.0.1:7001"
-          npm run greetings
+          echo "Running greetings tests directly..."
+          npx mocha "tests/scenarios/greetings/*.js" --reporter mochawesome --timeout 20000
