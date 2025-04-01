@@ -24,7 +24,7 @@ jobs:
         working-directory: greetings
         run: |
           echo "Installing all required dependencies..."
-          pip3 install -r requirements.txt
+          pip install -r requirements.txt
 
   deploy-to-dev:
     name: Deploy to Development Environment
@@ -45,7 +45,11 @@ jobs:
         working-directory: greetings
         run: |
           echo "Stopping old app (if running)..."
-          pm2 delete greetings-app-dev || true
+          try {
+            pm2 delete greetings-app-dev
+          } catch {
+            Write-Host "No existing app found or already stopped."
+          }
 
       - name: Start app with PM2
         shell: powershell
