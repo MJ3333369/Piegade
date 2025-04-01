@@ -54,7 +54,15 @@ jobs:
         run: |
           echo "Starting greetings-app-dev on port 7001..."
           pm2 start app.py --name greetings-app-dev --interpreter python --interpreter-args "--port 7001"
-          Start-Sleep -Seconds 5
+
+      - name: Check PM2 process status
+        shell: powershell
+        run: |
+          pm2 list
+
+      - name: Wait for app
+        shell: powershell
+        run: Start-Sleep -Seconds 10
 
   tests-on-dev:
     name: Run Tests on Development Environment
