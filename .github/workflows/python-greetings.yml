@@ -53,7 +53,7 @@ jobs:
         working-directory: greetings
         run: |
           echo "Starting greetings-app-dev on port 7001..."
-          pm2 start app.py --name greetings-app-dev --interpreter python --interpreter-args "--port 7001"
+          pm2 start "python app.py --port 7001" --name greetings-app-dev
 
       - name: Check PM2 process status
         shell: powershell
@@ -63,6 +63,12 @@ jobs:
       - name: Wait for app
         shell: powershell
         run: Start-Sleep -Seconds 10
+
+      - name: Show PM2 logs
+        shell: powershell
+        run: |
+          echo "Showing Flask app logs from PM2:"
+          pm2 logs greetings-app-dev --lines 50
 
   tests-on-dev:
     name: Run Tests on Development Environment
