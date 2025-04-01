@@ -56,6 +56,14 @@ jobs:
           echo "Stopping existing greetings-app-dev instance (if any)..."
           pm2 delete greetings-app-dev
 
+      - name: Test app.py manually
+        shell: powershell
+        working-directory: greetings
+        continue-on-error: true
+        run: |
+          echo "Running app.py to verify it starts correctly..."
+          python app.py
+
       - name: Start greetings app
         shell: powershell
         working-directory: greetings
