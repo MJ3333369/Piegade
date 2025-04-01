@@ -23,11 +23,11 @@ jobs:
         shell: powershell
         working-directory: greetings
         run: |
-          echo "Installing all required dependencies..."
+          echo "Installing Python dependencies..."
           pip install -r requirements.txt
 
   deploy-to-dev:
-    name: Deploy to Development Environment
+    name: Deploy to Dev Environment
     runs-on: self-hosted
     needs: install-pip-deps
     steps:
@@ -45,8 +45,8 @@ jobs:
         working-directory: greetings
         continue-on-error: true
         run: |
-          echo "Stopping old app (if running)..."
-          pm2 delete greetings-app-dev; exit 0
+          echo "Stopping previous app..."
+          pm2 delete greetings-app-dev & EXIT /B 0
 
       - name: Start app with PM2
         shell: powershell
@@ -56,14 +56,16 @@ jobs:
           pm2 start app.py --name greetings-app-dev --interpreter python
           Start-Sleep -Seconds 10
 
-      - name: Check PM2 process status
+      - name: Check PM2 status
         shell: powershell
-        run: |
-          echo "PM2 process list:"
-          pm2 list
+        run: pm2 list
+
+      - name: Show PM2 logs
+        shell: powershell
+        run: pm2 logs greetings-app-dev --lines 50
 
   tests-on-dev:
-    name: Run Tests on Development Environment
+    name: Run Tests on Dev
     runs-on: self-hosted
     needs: deploy-to-dev
     steps:
@@ -76,16 +78,12 @@ jobs:
           repository: mtararujs/course-js-api-framework
           path: test-framework
 
-      - name: Install test dependencies
+      - name: Install dependencies
         shell: powershell
         working-directory: test-framework
-        run: |
-          echo "Installing test dependencies..."
-          npm install
+        run: npm install
 
-      - name: Run greetings tests
+      - name: Run tests on dev
         shell: powershell
         working-directory: test-framework
-        run: |
-          echo "Running greetings tests..."
-          npm run greetings greetings_dev
+        run: npm run greetings greetings_dev
