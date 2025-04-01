@@ -20,7 +20,7 @@ jobs:
           path: greetings
 
       - name: Install Python dependencies
-        shell: bash
+        shell: powershell
         working-directory: greetings
         run: |
           echo "Installing all required dependencies..."
@@ -41,14 +41,14 @@ jobs:
           path: greetings
 
       - name: Stop existing app
-        shell: bash
+        shell: powershell
         working-directory: greetings
         run: |
           echo "Stopping old app (if running)..."
           pm2 delete greetings-app-dev || true
 
       - name: Start app with PM2
-        shell: bash
+        shell: powershell
         working-directory: greetings
         run: |
           echo "Starting greetings-app-dev on port 7001..."
@@ -69,14 +69,14 @@ jobs:
           path: test-framework
 
       - name: Install test dependencies
-        shell: bash
+        shell: powershell
         working-directory: test-framework
         run: |
           echo "Installing test dependencies..."
           npm install
 
       - name: Run greetings tests
-        shell: bash
+        shell: powershell
         working-directory: test-framework
         run: |
           echo "Running greetings tests against http://127.0.0.1:7001..."
