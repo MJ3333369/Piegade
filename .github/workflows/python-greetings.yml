@@ -20,20 +20,11 @@ jobs:
           path: greetings
 
       - name: Install Python dependencies
-        shell: powershell
+        shell: bash
         working-directory: greetings
         run: |
           echo "Installing all required dependencies..."
-          if (Test-Path "requirements.txt") {
-            try {
-              pip install -r requirements.txt
-            }
-            catch {
-              pip3 install -r requirements.txt
-            }
-          } else {
-            echo "requirements.txt file not found."
-          }
+          pip3 install -r requirements.txt
 
   deploy-to-dev:
     name: Deploy to Development Environment
@@ -49,29 +40,19 @@ jobs:
           repository: mtararujs/python-greetings
           path: greetings
 
-      - name: Stop existing app (if running)
-        shell: powershell
-        continue-on-error: true
-        run: |
-          echo "Stopping existing greetings-app-dev instance (if any)..."
-          pm2 delete greetings-app-dev
-
-      - name: Test app.py manually
-        shell: powershell
-        working-directory: greetings
-        continue-on-error: true
-        run: |
-          echo "Running app.py to verify it starts correctly..."
-          python app.py
-
-      - name: Start greetings app
-        shell: powershell
+      - name: Stop existing app
+        shell: bash
         working-directory: greetings
         run: |
-          echo "Starting greetings-app-dev..."
-          pm2 start app.py --name greetings-app-dev
-          echo "Waiting for app to fully start..."
-          Start-Sleep -Seconds 5
+          echo "Stopping old app (if running)..."
+          pm2 delete greetings-app-dev || true
+
+      - name: Start app with PM2
+        shell: bash
+        working-directory: greetings
+        run: |
+          echo "Starting greetings-app-dev on port 7001..."
+          pm2 start app.py --name greetings-app-dev -- --port 7001
 
   tests-on-dev:
     name: Run Tests on Development Environment
@@ -88,16 +69,15 @@ jobs:
           path: test-framework
 
       - name: Install test dependencies
-        shell: powershell
+        shell: bash
         working-directory: test-framework
         run: |
-          echo "Installing Node.js test dependencies..."
+          echo "Installing test dependencies..."
           npm install
 
-      - name: Run Mocha tests (greetings)
-        shell: powershell
+      - name: Run greetings tests
+        shell: bash
         working-directory: test-framework
         run: |
-          echo "Running Mocha greetings tests against http://127.0.0.1:7001..."
-          $env:BASE_URL="http://127.0.0.1:7001"
-          npm run greetings greetings_dev
+          echo "Running greetings tests against http://127.0.0.1:7001..."
+          npm run greetings
