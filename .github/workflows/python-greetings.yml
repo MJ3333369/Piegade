@@ -228,7 +228,7 @@ jobs:
       - name: Run tests against staging
         shell: powershell
         working-directory: test-framework
-        run: npm run greetings greetings_staging
+        run: npm run greetings greetings_stg
 
   tests-on-preprod:
     name: Run Tests on Preprod
