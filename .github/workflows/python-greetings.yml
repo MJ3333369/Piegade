@@ -27,76 +27,201 @@ jobs:
           pip install -r requirements.txt
 
   deploy-to-dev:
-    name: Deploy to Dev Environment
+    name: Deploy to Dev
     runs-on: self-hosted
     needs: install-pip-deps
     steps:
-      - name: Checkout pipeline repo
-        uses: actions/checkout@v4
-
-      - name: Clone python-greetings repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           repository: mtararujs/python-greetings
           path: greetings
-
-      - name: Stop existing PM2 app (ignore error if not found)
+      - name: Stop existing app
         shell: powershell
         working-directory: greetings
         continue-on-error: true
-        run: |
-          echo "Stopping previous PM2 app (ignore errors)..."
-          pm2 delete greetings-app-dev || exit 0
-
-      - name: Start app with PM2 on port 7001
+        run: pm2 delete greetings-app-dev || exit 0
+      - name: Start app on port 7001
         shell: powershell
         working-directory: greetings
         run: |
-          echo "Starting greetings-app-dev on port 7001..."
           $env:PORT=7001
           pm2 start app.py --name greetings-app-dev --interpreter python
           Start-Sleep -Seconds 10
 
-      - name: Check PM2 status
-        shell: powershell
-        run: pm2 list
-
   tests-on-dev:
-    name: Run Tests on Dev
+    name: Tests on Dev
     runs-on: self-hosted
     needs: deploy-to-dev
     steps:
-      - name: Checkout pipeline repo
-        uses: actions/checkout@v4
-
-      - name: Clone python-greetings repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          repository: mtararujs/python-greetings
-          path: greetings
-
-      - name: Ensure PM2 app is running before tests
+          repository: mtararujs/course-js-api-framework
+          path: test-framework
+      - name: Install dependencies
+        shell: powershell
+        working-directory: test-framework
+        run: npm install
+      - name: Restart PM2 if needed
         shell: powershell
         working-directory: greetings
         continue-on-error: true
         run: |
-          echo "Restarting or starting greetings-app-dev..."
-          $env:PORT=7001
-          pm2 start app.py --name greetings-app-dev --interpreter python
+          echo "Restarting PM2 app..."
+          pm2 restart greetings-app-dev || pm2 start app.py --name greetings-app-dev --interpreter python
           Start-Sleep -Seconds 5
-
-      - name: Clone test framework
-        uses: actions/checkout@v4
-        with:
-          repository: mtararujs/course-js-api-framework
-          path: test-framework
-
-      - name: Install Node.js dependencies
-        shell: powershell
-        working-directory: test-framework
-        run: npm install
-
-      - name: Run tests against dev
+      - name: Run tests
         shell: powershell
         working-directory: test-framework
         run: npm run greetings greetings_dev
+
+  deploy-to-staging:
+    name: Deploy to Staging
+    runs-on: self-hosted
+    needs: tests-on-dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: mtararujs/python-greetings
+          path: greetings
+      - name: Stop existing app
+        shell: powershell
+        working-directory: greetings
+        continue-on-error: true
+        run: pm2 delete greetings-app-staging || exit 0
+      - name: Start app on port 7002
+        shell: powershell
+        working-directory: greetings
+        run: |
+          $env:PORT=7002
+          pm2 start app.py --name greetings-app-staging --interpreter python
+          Start-Sleep -Seconds 10
+
+  tests-on-staging:
+    name: Tests on Staging
+    runs-on: self-hosted
+    needs: deploy-to-staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: mtararujs/course-js-api-framework
+          path: test-framework
+      - name: Install dependencies
+        shell: powershell
+        working-directory: test-framework
+        run: npm install
+      - name: Restart PM2 if needed
+        shell: powershell
+        working-directory: greetings
+        continue-on-error: true
+        run: |
+          echo "Restarting PM2 app..."
+          pm2 restart greetings-app-staging || pm2 start app.py --name greetings-app-staging --interpreter python
+          Start-Sleep -Seconds 5
+      - name: Run tests
+        shell: powershell
+        working-directory: test-framework
+        run: npm run greetings greetings_staging
+
+  deploy-to-preprod:
+    name: Deploy to Preprod
+    runs-on: self-hosted
+    needs: tests-on-staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: mtararujs/python-greetings
+          path: greetings
+      - name: Stop existing app
+        shell: powershell
+        working-directory: greetings
+        continue-on-error: true
+        run: pm2 delete greetings-app-preprod || exit 0
+      - name: Start app on port 7003
+        shell: powershell
+        working-directory: greetings
+        run: |
+          $env:PORT=7003
+          pm2 start app.py --name greetings-app-preprod --interpreter python
+          Start-Sleep -Seconds 10
+
+  tests-on-preprod:
+    name: Tests on Preprod
+    runs-on: self-hosted
+    needs: deploy-to-preprod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: mtararujs/course-js-api-framework
+          path: test-framework
+      - name: Install dependencies
+        shell: powershell
+        working-directory: test-framework
+        run: npm install
+      - name: Restart PM2 if needed
+        shell: powershell
+        working-directory: greetings
+        continue-on-error: true
+        run: |
+          echo "Restarting PM2 app..."
+          pm2 restart greetings-app-preprod || pm2 start app.py --name greetings-app-preprod --interpreter python
+          Start-Sleep -Seconds 5
+      - name: Run tests
+        shell: powershell
+        working-directory: test-framework
+        run: npm run greetings greetings_preprod
+
+  deploy-to-prod:
+    name: Deploy to Prod
+    runs-on: self-hosted
+    needs: tests-on-preprod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: mtararujs/python-greetings
+          path: greetings
+      - name: Stop existing app
+        shell: powershell
+        working-directory: greetings
+        continue-on-error: true
+        run: pm2 delete greetings-app-prod || exit 0
+      - name: Start app on port 7004
+        shell: powershell
+        working-directory: greetings
+        run: |
+          $env:PORT=7004
+          pm2 start app.py --name greetings-app-prod --interpreter python
+          Start-Sleep -Seconds 10
+
+  tests-on-prod:
+    name: Tests on Prod
+    runs-on: self-hosted
+    needs: deploy-to-prod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: mtararujs/course-js-api-framework
+          path: test-framework
+      - name: Install dependencies
+        shell: powershell
+        working-directory: test-framework
+        run: npm install
+      - name: Restart PM2 if needed
+        shell: powershell
+        working-directory: greetings
+        continue-on-error: true
+        run: |
+          echo "Restarting PM2 app..."
+          pm2 restart greetings-app-prod || pm2 start app.py --name greetings-app-prod --interpreter python
+          Start-Sleep -Seconds 5
+      - name: Run tests
+        shell: powershell
+        working-directory: test-framework
+        run: npm run greetings greetings_prod
