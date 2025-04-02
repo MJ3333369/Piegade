@@ -48,21 +48,21 @@ jobs:
           echo "Stopping previous app..."
           pm2 delete greetings-app-dev; exit 0
 
-      - name: Start app with PM2
+      - name: Start app with PM2 on port 7001
         shell: powershell
         working-directory: greetings
         run: |
           echo "Starting greetings-app-dev on port 7001..."
-          $env:PORT=7001; pm2 start app.py --name greetings-app-dev --interpreter python
+          pm2 start app.py --name greetings-app-dev --interpreter python -- --port 7001
           Start-Sleep -Seconds 10
 
       - name: Check PM2 status
         shell: powershell
         run: pm2 list
 
-      - name: Show PM2 logs
+      - name: Show PM2 logs (last 50 lines)
         shell: powershell
-        run: pm2 logs greetings-app-dev --lines 50
+        run: pm2 logs greetings-app-dev --lines 50 --nostream
 
   tests-on-dev:
     name: Run Tests on Dev
