@@ -1,0 +1,11 @@
+name: Install Python Dependencies
+description: Installs Python dependencies from requirements.txt
+runs:
+  using: "composite"
+  steps:
+    - name: Install Python dependencies
+      shell: powershell
+      working-directory: greetings
+      run: |
+        echo "Installing Python dependencies..."
+        pip install -r requirements.txt

@@ -1,0 +1,19 @@
+name: Run Tests
+description: Installs Node.js dependencies and runs tests for a specific environment
+inputs:
+  env_tag:
+    required: true
+    description: Environment tag (e.g. greetings_dev)
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Node.js dependencies
+      shell: powershell
+      working-directory: test-framework
+      run: npm install
+
+    - name: Run tests
+      shell: powershell
+      working-directory: test-framework
+      run: npm run greetings ${{ inputs.env_tag }}

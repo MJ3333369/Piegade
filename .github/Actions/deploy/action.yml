@@ -1,0 +1,29 @@
+name: Deploy Python App
+description: Stops and starts the Python app with PM2 on a given port
+inputs:
+  environment:
+    required: true
+    description: Environment name (e.g. dev, staging)
+  port:
+    required: true
+    description: Port number to bind the app
+
+runs:
+  using: "composite"
+  steps:
+    - name: Stop PM2 process
+      shell: powershell
+      working-directory: greetings
+      continue-on-error: true
+      run: |
+        echo "Stopping PM2 app..."
+        pm2 delete greetings-app-${{ inputs.environment }}; exit 0
+
+    - name: Start PM2 process
+      shell: powershell
+      working-directory: greetings
+      run: |
+        echo "Starting greetings-app-${{ inputs.environment }} on port ${{ inputs.port }}..."
+        $env:PORT=${{ inputs.port }}
+        pm2 start app.py --name greetings-app-${{ inputs.environment }} --interpreter python
+        Start-Sleep -Seconds 10
