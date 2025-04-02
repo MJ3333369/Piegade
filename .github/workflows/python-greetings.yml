@@ -61,10 +61,6 @@ jobs:
         shell: powershell
         run: pm2 list
 
-      - name: Show PM2 logs
-        shell: powershell
-        run: pm2 logs greetings-app-dev --lines 30
-
   tests-on-dev:
     name: Run Tests on Dev
     runs-on: self-hosted
