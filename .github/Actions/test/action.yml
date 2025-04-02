@@ -1,19 +1,27 @@
 name: Run Tests
-description: Installs Node.js dependencies and runs tests for a specific environment
+description: "Run test framework against environment"
+
 inputs:
-  env_tag:
+  working-dir:
+    description: "Path to the test framework directory"
     required: true
-    description: Environment tag (e.g. greetings_dev)
+  test-env:
+    description: "Environment tag (e.g. greetings_dev)"
+    required: true
 
 runs:
   using: "composite"
   steps:
-    - name: Install Node.js dependencies
+    - name: Install dependencies
       shell: powershell
-      working-directory: test-framework
-      run: npm install
+      working-directory: ${{ inputs.working-dir }}
+      run: |
+        echo "Installing Node.js dependencies..."
+        npm install
 
     - name: Run tests
       shell: powershell
-      working-directory: test-framework
-      run: npm run greetings ${{ inputs.env_tag }}
+      working-directory: ${{ inputs.working-dir }}
+      run: |
+        echo "Running tests against environment ${{ inputs.test-env }}..."
+        npm run greetings ${{ inputs.test-env }}
