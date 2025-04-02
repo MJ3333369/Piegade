@@ -40,7 +40,7 @@ jobs:
           repository: mtararujs/python-greetings
           path: greetings
 
-      - name: Stop existing app
+      - name: Stop existing PM2 app (ignore error if not found)
         shell: powershell
         working-directory: greetings
         continue-on-error: true
@@ -69,6 +69,22 @@ jobs:
       - name: Checkout pipeline repo
         uses: actions/checkout@v4
 
+      - name: Clone python-greetings repo
+        uses: actions/checkout@v4
+        with:
+          repository: mtararujs/python-greetings
+          path: greetings
+
+      - name: Ensure PM2 app is running before tests
+        shell: powershell
+        working-directory: greetings
+        continue-on-error: true
+        run: |
+          echo "Restarting or starting greetings-app-dev..."
+          $env:PORT=7001
+          pm2 start app.py --name greetings-app-dev --interpreter python
+          Start-Sleep -Seconds 5
+
       - name: Clone test framework
         uses: actions/checkout@v4
         with:
@@ -79,16 +95,6 @@ jobs:
         shell: powershell
         working-directory: test-framework
         run: npm install
-
-      - name: Restart PM2 app in case not running
-        shell: powershell
-        working-directory: greetings
-        continue-on-error: true
-        run: |
-          echo "Ensuring greetings-app-dev is running before tests..."
-          $env:PORT=7001
-          pm2 start app.py --name greetings-app-dev --interpreter python
-          Start-Sleep -Seconds 5
 
       - name: Run tests against dev
         shell: powershell
