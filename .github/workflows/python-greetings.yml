@@ -40,20 +40,20 @@ jobs:
           repository: mtararujs/python-greetings
           path: greetings
 
-      - name: Stop existing app
+      - name: Stop existing app (if running)
         shell: powershell
         working-directory: greetings
         continue-on-error: true
         run: |
           echo "Stopping previous app..."
-          pm2 delete greetings-app-dev & EXIT /B 0
+          pm2 delete greetings-app-dev || exit 0
 
-      - name: Start app with PM2
+      - name: Start app with PM2 on port 7001
         shell: powershell
         working-directory: greetings
         run: |
           echo "Starting greetings-app-dev on port 7001..."
-          pm2 start app.py --name greetings-app-dev --interpreter python
+          pm2 start app.py --name greetings-app-dev --interpreter python -- --port 7001
           Start-Sleep -Seconds 10
 
       - name: Check PM2 status
@@ -78,12 +78,12 @@ jobs:
           repository: mtararujs/course-js-api-framework
           path: test-framework
 
-      - name: Install dependencies
+      - name: Install test dependencies
         shell: powershell
         working-directory: test-framework
         run: npm install
 
-      - name: Run tests on dev
+      - name: Run greetings tests on dev
         shell: powershell
         working-directory: test-framework
         run: npm run greetings greetings_dev
