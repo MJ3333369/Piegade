@@ -45,24 +45,25 @@ jobs:
         working-directory: greetings
         continue-on-error: true
         run: |
-          echo "Stopping previous app..."
-          pm2 delete greetings-app-dev; exit 0
+          echo "Stopping previous PM2 app (ignore errors)..."
+          pm2 delete greetings-app-dev || exit 0
 
       - name: Start app with PM2 on port 7001
         shell: powershell
         working-directory: greetings
         run: |
           echo "Starting greetings-app-dev on port 7001..."
-          pm2 start app.py --name greetings-app-dev --interpreter python -- --port 7001
+          $env:PORT=7001
+          pm2 start app.py --name greetings-app-dev --interpreter python
           Start-Sleep -Seconds 10
 
       - name: Check PM2 status
         shell: powershell
         run: pm2 list
 
-      - name: Show PM2 logs (last 50 lines)
+      - name: Show PM2 logs
         shell: powershell
-        run: pm2 logs greetings-app-dev --lines 50 --nostream
+        run: pm2 logs greetings-app-dev --lines 30
 
   tests-on-dev:
     name: Run Tests on Dev
@@ -78,12 +79,12 @@ jobs:
           repository: mtararujs/course-js-api-framework
           path: test-framework
 
-      - name: Install dependencies
+      - name: Install Node.js dependencies
         shell: powershell
         working-directory: test-framework
         run: npm install
 
-      - name: Run tests on dev
+      - name: Run tests against dev
         shell: powershell
         working-directory: test-framework
         run: npm run greetings greetings_dev
