@@ -40,12 +40,12 @@ jobs:
           repository: mtararujs/python-greetings
           path: greetings
 
-      - name: Stop existing app
+      - name: Stop existing app (ignore if not running)
         shell: powershell
         working-directory: greetings
         continue-on-error: true
         run: |
-          echo "Stopping previous PM2 app (ignore errors)..."
+          echo "Stopping previous PM2 app..."
           pm2 delete greetings-app-dev || exit 0
 
       - name: Start app with PM2 on port 7001
@@ -57,9 +57,9 @@ jobs:
           pm2 start app.py --name greetings-app-dev --interpreter python
           Start-Sleep -Seconds 10
 
-      - name: Check PM2 status
+      - name: Save PM2 process list
         shell: powershell
-        run: pm2 list
+        run: pm2 save
 
   tests-on-dev:
     name: Run Tests on Dev
@@ -79,6 +79,13 @@ jobs:
         shell: powershell
         working-directory: test-framework
         run: npm install
+
+      - name: Restart PM2 app before tests
+        shell: powershell
+        run: |
+          echo "Restarting PM2 app just to make sure it's running..."
+          pm2 restart greetings-app-dev
+          Start-Sleep -Seconds 5
 
       - name: Run tests against dev
         shell: powershell
